@@ -97,6 +97,11 @@ input[type="range"] { accent-color: var(--gold); width: 160px; }
   padding: 10px 16px;
   font-size: 0.9rem;
 }
+.btn-ghost.active {
+  background: var(--green);
+  color: var(--cream);
+  border-color: transparent;
+}
 .btn-lg { width: 100%; padding: 16px; font-size: 1.1rem; margin-top: 6px; }
 .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
 .btn-primary:active, .btn-secondary:active, .btn-ghost:active, .btn-action:active { transform: scale(0.97); }

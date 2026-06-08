@@ -83,7 +83,7 @@ function cacheEls() {
     'view-settings', 'view-practice', 'settings-form', 'start-btn', 'settings-btn',
     'opt-decks', 'opt-soft17', 'opt-das', 'opt-double-range', 'opt-surrender', 'opt-penetration',
     'opt-deviations', 'opt-insurance', 'opt-show-count', 'opt-count-quiz', 'opt-drill-mode',
-    'opt-voice-out', 'opt-voice-in', 'opt-voice-select', 'opt-rate', 'voice-support-note',
+    'opt-voice-out', 'opt-voice-in', 'opt-voice-select', 'opt-rate', 'voice-support-note', 'handsfree-btn',
     'trouble-spots', 'trouble-spots-list', 'reset-mistakes-btn',
     'stat-hands', 'stat-accuracy', 'stat-running', 'stat-true', 'count-stat-running', 'count-stat-true',
     'dealer-cards', 'player-cards', 'player-total', 'status-pill', 'prompt-text', 'mic-indicator',
@@ -132,6 +132,39 @@ function applySettingsToForm() {
   els['opt-voice-out'].checked = s.voiceOut;
   els['opt-voice-in'].checked = s.voiceIn && App.Voice.supportsRecognition;
   els['opt-rate'].value = String(s.rate);
+  syncHandsFreeButton();
+}
+
+// Hands-free is "on" when both spoken readout and mic input are enabled.
+// The toggle flips both together; voice input only activates if the browser supports it.
+function isHandsFree() {
+  return state.settings.voiceOut && state.settings.voiceIn && App.Voice.supportsRecognition;
+}
+
+function syncHandsFreeButton() {
+  const btn = els['handsfree-btn'];
+  if (!btn) return;
+  const on = isHandsFree();
+  btn.textContent = on ? '🤝 Hands-Free: On' : '🤝 Hands-Free: Off';
+  btn.setAttribute('aria-pressed', String(on));
+  btn.classList.toggle('active', on);
+  btn.disabled = !App.Voice.supportsRecognition && !App.Voice.supportsSynthesis;
+  btn.title = App.Voice.supportsRecognition
+    ? 'Toggle spoken readout and voice answers on or off together'
+    : 'Voice input is not supported in this browser — only spoken readout can be toggled';
+}
+
+function setHandsFree(on) {
+  state.settings.voiceOut = on;
+  state.settings.voiceIn = on && App.Voice.supportsRecognition;
+  saveSettings();
+  syncHandsFreeButton();
+  els['opt-voice-out'].checked = state.settings.voiceOut;
+  els['opt-voice-in'].checked = state.settings.voiceIn;
+  if (!on) {
+    App.Voice.stopSpeaking();
+    App.Voice.stopListening();
+  }
 }
 
 function readSettingsFromForm() {
@@ -165,6 +198,10 @@ function wireEvents() {
   els['settings-btn'].addEventListener('click', () => {
     stopPractice();
     showView('settings');
+  });
+
+  els['handsfree-btn'].addEventListener('click', () => {
+    setHandsFree(!isHandsFree());
   });
 
   els['mute-btn'].addEventListener('click', () => {
