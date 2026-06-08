@@ -314,28 +314,12 @@ function stopPractice() {
 }
 
 async function runLoop() {
-  if (state.drillMode) {
-    await speak('Starting drill mode. I\'ll deal hands weighted toward the scenarios you miss most — no count tracking here, just strategy.');
-  } else {
-    await speak('Starting practice. ' + describeRules());
-  }
   while (state.running) {
     if (state.paused) { await sleep(250); continue; }
     await playRound();
     if (!state.running) return;
     await sleep(500);
   }
-}
-
-function describeRules() {
-  const s = state.settings;
-  const bits = [
-    `${s.decks} deck${s.decks > 1 ? 's' : ''}`,
-    s.dealerHitsSoft17 ? 'dealer hits soft 17' : 'dealer stands on soft 17',
-    s.doubleAfterSplit ? 'double after split allowed' : 'no double after split',
-    s.surrenderAllowed ? 'late surrender allowed' : 'no surrender',
-  ];
-  return bits.join(', ') + '.';
 }
 
 // ===== One round = one initial-draw decision (no full hand play-out) =====
