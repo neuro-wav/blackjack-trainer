@@ -189,11 +189,15 @@
 
         <div class="action-controls">
           <div id="action-buttons" class="action-buttons">
-            <button type="button" class="btn-action" data-action="hit">Hit</button>
-            <button type="button" class="btn-action" data-action="stand">Stand</button>
-            <button type="button" class="btn-action" data-action="double">Double</button>
-            <button type="button" class="btn-action" data-action="split">Split</button>
-            <button type="button" class="btn-action" data-action="surrender">Surrender</button>
+            <div class="action-row">
+              <button type="button" class="btn-action" data-action="hit">Hit</button>
+              <button type="button" class="btn-action" data-action="stand">Stand</button>
+            </div>
+            <div class="action-row">
+              <button type="button" class="btn-action" data-action="double">Double</button>
+              <button type="button" class="btn-action" data-action="split">Split</button>
+              <button type="button" class="btn-action" data-action="surrender">Surrender</button>
+            </div>
           </div>
           <div id="yesno-buttons" class="action-buttons hidden">
             <button type="button" class="btn-action" data-yesno="yes">Yes, insure</button>
