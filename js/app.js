@@ -323,7 +323,7 @@ async function runLoop() {
     if (state.paused) { await sleep(250); continue; }
     await playRound();
     if (!state.running) return;
-    await sleep(1100);
+    await sleep(500);
   }
 }
 
@@ -368,11 +368,11 @@ async function playRound() {
   // Player blackjack: no decision to make.
   if (hand.kind === 'soft' && hand.total === 21) {
     setStatus('Blackjack!');
-    const text = `Blackjack! ${cardPhrase(playerCards)} — an automatic win. No decision needed.`;
+    const text = `Blackjack! An automatic win. No decision needed.`;
     els['prompt-text'].textContent = text;
     state.currentPromptText = text;
     await speak(text);
-    await sleep(900);
+    await sleep(400);
     return;
   }
 
@@ -424,10 +424,6 @@ function describeTotal(hand) {
 function rankPlural(rank) {
   const names = { 'A': 'Aces', 'K': 'Kings', 'Q': 'Queens', 'J': 'Jacks' };
   return names[rank] || `${rank}s`;
-}
-
-function cardPhrase(cards) {
-  return cards.map(c => c.spoken).join(' and ');
 }
 
 // ----- Insurance sub-decision -----
@@ -489,14 +485,14 @@ async function handleActionDecision(playerCards, dealerUp, hand, rules, trueCoun
   const feedbackText = buildFeedbackText(isCorrect, answer, result, trueCount);
   showFeedback(isCorrect, feedbackText.banner);
   await speak(feedbackText.spoken);
-  await sleep(500);
+  await sleep(250);
   unhighlightButtons();
 }
 
 function buildPrompt(hand, playerCards, dealerUp) {
   const handDesc = hand.kind === 'pair'
     ? `a pair of ${rankPlural(hand.pairRank)}`
-    : `${cardPhrase(playerCards)}, ${hand.kind === 'soft' ? 'a soft' : 'a hard'} ${hand.total}`;
+    : `${hand.kind === 'soft' ? 'soft' : 'hard'} ${hand.total}`;
   return `You have ${handDesc}. Dealer shows ${dealerUp.spoken}. Hit, stand, double, split, or surrender?`;
 }
 
@@ -560,7 +556,7 @@ async function runCountQuiz() {
 
   showFeedback(isCorrect, banner);
   await speak(spoken);
-  await sleep(500);
+  await sleep(250);
 }
 
 function formatCount(n) {
