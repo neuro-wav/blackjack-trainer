@@ -60,8 +60,9 @@ const PAIRS_S17 = {
 
 // ----- Differences when the dealer Hits on Soft 17 (well-documented deltas) -----
 const H17_OVERRIDES = {
-  hard: { 11: { [col('A')]: 'D' }, 15: { [col('A')]: 'R' } },
+  hard: { 11: { [col('A')]: 'D' }, 15: { [col('A')]: 'R' }, 17: { [col('A')]: 'Rs' } },
   soft: { 19: { [col('6')]: 'Ds' } },
+  pair: { '8,8': { [col('A')]: 'Rp' } },
 };
 
 // ----- Illustrious 18 (Hi-Lo) count-based deviations -----
@@ -138,6 +139,8 @@ function resolveCode(code, total, rules) {
     case 'Ds': return canDouble ? 'double' : 'stand';
     case 'Ph': return rules.doubleAfterSplit ? 'split' : 'hit';
     case 'R': return rules.surrenderAllowed ? 'surrender' : 'hit';
+    case 'Rs': return rules.surrenderAllowed ? 'surrender' : 'stand';
+    case 'Rp': return rules.surrenderAllowed ? 'surrender' : 'split';
     default: return 'hit';
   }
 }
@@ -172,8 +175,7 @@ function lookupHard(hand, dealerLabel, rules) {
   const c = col(dealerLabel);
   let total = hand.total;
   if (total <= 7) return { code: 'H', total };
-  if (total >= 17) return { code: 'S', total };
-  let code = HARD_S17[total][c];
+  let code = total >= 17 ? 'S' : HARD_S17[total][c];
   if (rules.dealerHitsSoft17) code = applyOverride(H17_OVERRIDES.hard, total, c, code);
   return { code, total };
 }

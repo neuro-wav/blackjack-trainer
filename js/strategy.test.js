@@ -60,7 +60,11 @@ checkAction('Hard 16 vs 9, surrender allowed -> surrender', ['9', '7'], '9', S17
 checkAction('Hard 16 vs 9, surrender NOT allowed -> hit', ['9', '7'], '9', { ...S17_DAS, surrenderAllowed: false }, 'hit');
 checkAction('Hard 16 vs 10, surrender allowed -> surrender', ['10', '6'], '10', S17_DAS, 'surrender');
 checkAction('Hard 16 vs 10, surrender NOT allowed -> hit', ['10', '6'], '10', { ...S17_DAS, surrenderAllowed: false }, 'hit');
-checkAction('Hard 17 vs A -> stand (always stand >=17)', ['10', '7'], 'A', S17_DAS, 'stand');
+checkAction('Hard 17 vs A, S17 -> stand (always stand >=17 when dealer stands soft 17)', ['10', '7'], 'A', S17_DAS, 'stand');
+checkAction('Hard 17 vs A, H17, surrender allowed -> surrender (Wizard of Odds / BJA / BlackjackInfo / Aponte all agree)', ['10', '7'], 'A', H17_DAS, 'surrender');
+checkAction('Hard 17 vs A, H17, surrender NOT allowed -> stand (SR/S falls back to stand, not hit)', ['10', '7'], 'A', { ...H17_DAS, surrenderAllowed: false }, 'stand');
+checkAction('Hard 17 vs 10, H17 -> stand (override is specific to vs Ace only)', ['10', '7'], '10', H17_DAS, 'stand');
+checkAction('Hard 18 vs A, H17 -> stand (override does not extend beyond hard 17)', ['10', '8'], 'A', H17_DAS, 'stand');
 checkAction('Hard 7 vs 6 -> hit (always hit <=7)', ['4', '3'], '6', S17_DAS, 'hit');
 
 // ----- Soft totals -----
@@ -76,6 +80,11 @@ checkAction('Soft 20 (A,9) vs anything -> stand', ['A', '9'], '6', S17_DAS, 'sta
 
 // ----- Pairs -----
 checkAction('A,A -> split', ['A', 'A'], '6', S17_DAS, 'split');
+checkAction('8,8 vs A, S17 -> split (always split under S17)', ['8', '8'], 'A', S17_DAS, 'split');
+checkAction('8,8 vs A, H17, surrender allowed -> surrender (Wizard of Odds / BJA / BlackjackInfo / Aponte all agree)', ['8', '8'], 'A', H17_DAS, 'surrender');
+checkAction('8,8 vs A, H17, surrender NOT allowed -> split (SR/P falls back to split, not hit)', ['8', '8'], 'A', { ...H17_DAS, surrenderAllowed: false }, 'split');
+checkAction('8,8 vs 10, H17 -> split (override is specific to vs Ace only)', ['8', '8'], '10', H17_DAS, 'split');
+checkAction('9,9 vs A, H17 -> stand (override does not extend to other pairs)', ['9', '9'], 'A', H17_DAS, 'stand');
 checkAction('8,8 vs A -> split (always split)', ['8', '8'], 'A', S17_DAS, 'split');
 checkAction('5,5 vs 6 -> double (treated as hard 10)', ['5', '5'], '6', S17_DAS, 'double');
 checkAction('5,5 vs 10 -> hit (treated as hard 10)', ['5', '5'], '10', S17_DAS, 'hit');
