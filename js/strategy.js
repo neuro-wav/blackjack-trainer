@@ -209,6 +209,54 @@ function findDeviation(hand, dealerLabel) {
   return ILLUSTRIOUS_18.find(d => d.hand === handKey && d.dealer === dealerLabel) || null;
 }
 
+function actionAbbrev(action) {
+  switch (action) {
+    case 'hit': return 'H';
+    case 'stand': return 'S';
+    case 'double': return 'D';
+    case 'split': return 'P';
+    case 'surrender': return 'R';
+    default: return '?';
+  }
+}
+
+// Build a full basic-strategy chart for the given table rules (ignores count
+// deviations — this is the chart a player would memorize for these rules).
+// Returns { cols, hardRows, softRows, pairRows }, each row { label, cells }
+// where cells are single-letter actions (H/S/D/P/R) in dealer-upcard order.
+function buildChart(rules) {
+  const cols = DEALER_COLS;
+
+  const hardRows = [];
+  for (let total = 5; total <= 17; total++) {
+    const cells = cols.map(label => {
+      const { code, total: t } = lookupHard({ kind: 'hard', total }, label, rules);
+      return actionAbbrev(resolveCode(code, t, rules));
+    });
+    hardRows.push({ label: String(total), cells });
+  }
+
+  const softRows = [];
+  for (let total = 13; total <= 20; total++) {
+    const cells = cols.map(label => {
+      const { code, total: t } = lookupSoft({ kind: 'soft', total }, label, rules);
+      return actionAbbrev(resolveCode(code, t, rules));
+    });
+    softRows.push({ label: `A,${total - 11}`, cells });
+  }
+
+  const pairRows = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'A'].map(rank => {
+    const hand = { kind: 'pair', pairRank: rank, total: rank === 'A' ? 12 : rank === '10' ? 20 : Number(rank) * 2 };
+    const cells = cols.map(label => {
+      const { code, total: t } = lookupBaseAction(hand, label, rules);
+      return actionAbbrev(resolveCode(code, t, rules));
+    });
+    return { label: `${rank},${rank}`, cells };
+  });
+
+  return { cols, hardRows, softRows, pairRows };
+}
+
 // Main entry point.
 // rules: { decks, dealerHitsSoft17, doubleAfterSplit, doubleRange, surrenderAllowed, useDeviations }
 // dealerUpcard: card object { rank, value, label }
@@ -219,6 +267,7 @@ App.Strategy = {
   ILLUSTRIOUS_18,
 
   classifyHand,
+  buildChart,
 
   decide(playerCards, dealerUpcard, rules, trueCount) {
     const hand = classifyHand(playerCards);

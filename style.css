@@ -128,6 +128,85 @@ input[type="range"] { accent-color: var(--gold); width: 160px; }
   white-space: nowrap;
 }
 
+/* ===== Quick-reference strategy chart ===== */
+.chart-panel {
+  background: var(--panel);
+  border: 1px solid rgba(245,239,227,0.15);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.chart-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.chart-panel-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--gold);
+}
+.chart-rules-summary {
+  margin: 6px 0 12px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.chart-scroll {
+  overflow-x: auto;
+}
+.chart-table {
+  border-collapse: collapse;
+  margin-bottom: 14px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+.chart-table th, .chart-table td {
+  border: 1px solid rgba(245,239,227,0.12);
+  padding: 4px 7px;
+  text-align: center;
+}
+.chart-table th {
+  color: var(--cream);
+  font-weight: 600;
+  background: rgba(0,0,0,0.15);
+}
+.chart-table th:first-child {
+  text-align: left;
+}
+.chart-cell { color: #1a1a1a; font-weight: 700; }
+.chart-cell-h { background: var(--cream); }
+.chart-cell-s { background: var(--muted); }
+.chart-cell-d { background: var(--gold); }
+.chart-cell-p { background: var(--blue); color: var(--cream); }
+.chart-cell-r { background: var(--red); color: var(--cream); }
+.chart-legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--cream);
+}
+.chart-legend li { display: flex; align-items: center; gap: 6px; }
+.chart-key {
+  display: inline-block;
+  width: 1.4em;
+  height: 1.4em;
+  line-height: 1.4em;
+  text-align: center;
+  border-radius: 4px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.chart-key-h { background: var(--cream); }
+.chart-key-s { background: var(--muted); }
+.chart-key-d { background: var(--gold); }
+.chart-key-p { background: var(--blue); color: var(--cream); }
+.chart-key-r { background: var(--red); color: var(--cream); }
+
 .trouble-spots { margin-top: 14px; }
 .trouble-spots-label {
   font-size: 0.8rem;

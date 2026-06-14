@@ -89,6 +89,7 @@ function cacheEls() {
     'dealer-cards', 'player-cards', 'player-total', 'status-pill', 'prompt-text', 'mic-indicator',
     'feedback-banner', 'action-buttons', 'yesno-buttons', 'count-input-row', 'count-answer', 'count-submit',
     'listen-btn', 'pause-btn', 'repeat-btn', 'mute-btn', 'drill-indicator',
+    'chart-btn', 'chart-panel', 'chart-close-btn', 'chart-rules-summary', 'chart-hard', 'chart-soft', 'chart-pairs',
   ].forEach(id => { els[id] = $(id); });
 }
 
@@ -167,6 +168,41 @@ function setHandsFree(on) {
   }
 }
 
+// ===== Quick-reference basic strategy chart for the current table rules =====
+function toggleChart() {
+  setChartVisible(els['chart-panel'].classList.contains('hidden'));
+}
+
+function setChartVisible(visible) {
+  if (visible) renderChart();
+  els['chart-panel'].classList.toggle('hidden', !visible);
+  els['chart-btn'].setAttribute('aria-pressed', String(visible));
+  els['chart-btn'].classList.toggle('active', visible);
+}
+
+function renderChart() {
+  const rules = rulesFromSettings(state.settings);
+  const chart = App.Strategy.buildChart(rules);
+
+  els['chart-rules-summary'].textContent =
+    `${rules.decks} deck${rules.decks > 1 ? 's' : ''}, dealer ${rules.dealerHitsSoft17 ? 'hits' : 'stands on'} soft 17, ` +
+    `${rules.doubleAfterSplit ? 'DAS' : 'no DAS'}, double on ${rules.doubleRange === 'any' ? 'any two cards' : rules.doubleRange}, ` +
+    `surrender ${rules.surrenderAllowed ? 'allowed' : 'not allowed'}.`;
+
+  els['chart-hard'].innerHTML = renderChartTable('Hard Totals', chart.cols, chart.hardRows);
+  els['chart-soft'].innerHTML = renderChartTable('Soft Totals', chart.cols, chart.softRows);
+  els['chart-pairs'].innerHTML = renderChartTable('Pairs', chart.cols, chart.pairRows);
+}
+
+function renderChartTable(title, cols, rows) {
+  const head = `<tr><th>${title}</th>${cols.map(c => `<th>${c}</th>`).join('')}</tr>`;
+  const body = rows.map(row => {
+    const cells = row.cells.map(code => `<td class="chart-cell chart-cell-${code.toLowerCase()}">${code}</td>`).join('');
+    return `<tr><th>${row.label}</th>${cells}</tr>`;
+  }).join('');
+  return `<table class="chart-table">${head}${body}</table>`;
+}
+
 function readSettingsFromForm() {
   return {
     decks: parseInt(els['opt-decks'].value, 10),
@@ -192,16 +228,25 @@ function wireEvents() {
     e.preventDefault();
     state.settings = readSettingsFromForm();
     saveSettings();
+    if (!els['chart-panel'].classList.contains('hidden')) renderChart();
     startPractice();
   });
 
   els['settings-btn'].addEventListener('click', () => {
     stopPractice();
+    setChartVisible(false);
     showView('settings');
   });
 
   els['handsfree-btn'].addEventListener('click', () => {
     setHandsFree(!isHandsFree());
+  });
+
+  els['chart-btn'].addEventListener('click', () => {
+    toggleChart();
+  });
+  els['chart-close-btn'].addEventListener('click', () => {
+    setChartVisible(false);
   });
 
   els['mute-btn'].addEventListener('click', () => {

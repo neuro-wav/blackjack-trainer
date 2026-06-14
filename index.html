@@ -161,8 +161,29 @@
             <div class="stat" id="count-stat-true"><span class="stat-label">True Count</span><span id="stat-true" class="stat-value">0.0</span></div>
           </div>
           <button type="button" id="handsfree-btn" class="btn-ghost btn-sm" aria-pressed="false">🤝 Hands-Free: Off</button>
+          <button type="button" id="chart-btn" class="btn-ghost btn-sm" aria-pressed="false">📋 Chart</button>
           <button type="button" id="mute-btn" class="btn-ghost btn-sm">🔊</button>
         </header>
+
+        <div id="chart-panel" class="chart-panel hidden">
+          <div class="chart-panel-header">
+            <h3>Basic Strategy — Your Rules</h3>
+            <button type="button" id="chart-close-btn" class="btn-ghost btn-sm">✕</button>
+          </div>
+          <p id="chart-rules-summary" class="chart-rules-summary"></p>
+          <div class="chart-scroll">
+            <div id="chart-hard"></div>
+            <div id="chart-soft"></div>
+            <div id="chart-pairs"></div>
+          </div>
+          <ul class="chart-legend">
+            <li><span class="chart-key chart-key-h">H</span> Hit</li>
+            <li><span class="chart-key chart-key-s">S</span> Stand</li>
+            <li><span class="chart-key chart-key-d">D</span> Double</li>
+            <li><span class="chart-key chart-key-p">P</span> Split</li>
+            <li><span class="chart-key chart-key-r">R</span> Surrender</li>
+          </ul>
+        </div>
 
         <div class="table-felt">
           <div class="dealer-area">

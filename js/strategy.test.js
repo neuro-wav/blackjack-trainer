@@ -158,5 +158,35 @@ checkAction('Hard 16 vs 10, useDeviations=false, count +5 -> still surrender (ba
   check('Hard 16 vs 9 @ count -1: basicAction still reports the underlying basic-strategy play ("surrender")', result.basicAction, 'surrender');
 })();
 
+// ----- buildChart: spot-check cells against the same hands tested above -----
+(function () {
+  const chart = Strategy.buildChart(S17_DAS);
+  const hardRow = (total) => chart.hardRows.find(r => r.label === String(total));
+  const softRow = (total) => chart.softRows.find(r => r.label === `A,${total - 11}`);
+  const pairRow = (rank) => chart.pairRows.find(r => r.label === `${rank},${rank}`);
+  const colIdx = (label) => chart.cols.indexOf(label);
+
+  check('buildChart: hard 16 vs 10 (S17) -> R (surrender)', hardRow(16).cells[colIdx('10')], 'R');
+  check('buildChart: hard 12 vs 4 -> S (stand)', hardRow(12).cells[colIdx('4')], 'S');
+  check('buildChart: hard 11 vs A (S17) -> H (no double vs Ace under S17)', hardRow(11).cells[colIdx('A')], 'H');
+  check('buildChart: soft 18 (A,7) vs 9 -> H', softRow(18).cells[colIdx('9')], 'H');
+  check('buildChart: 8,8 vs A (S17) -> P (always split)', pairRow('8').cells[colIdx('A')], 'P');
+  check('buildChart: 5,5 vs 6 -> D (played as hard 10)', pairRow('5').cells[colIdx('6')], 'D');
+  check('buildChart: 10,10 vs 6 -> S (never split tens)', pairRow('10').cells[colIdx('6')], 'S');
+
+  const h17Chart = Strategy.buildChart(H17_DAS);
+  const h17HardRow = (total) => h17Chart.hardRows.find(r => r.label === String(total));
+  const h17PairRow = (rank) => h17Chart.pairRows.find(r => r.label === `${rank},${rank}`);
+  check('buildChart: hard 11 vs A (H17) -> D', h17HardRow(11).cells[colIdx('A')], 'D');
+  check('buildChart: hard 17 vs A (H17), surrender allowed -> R', h17HardRow(17).cells[colIdx('A')], 'R');
+  check('buildChart: 8,8 vs A (H17), surrender allowed -> R', h17PairRow('8').cells[colIdx('A')], 'R');
+
+  const noSurrenderChart = Strategy.buildChart({ ...H17_DAS, surrenderAllowed: false });
+  const nsHardRow = (total) => noSurrenderChart.hardRows.find(r => r.label === String(total));
+  const nsPairRow = (rank) => noSurrenderChart.pairRows.find(r => r.label === `${rank},${rank}`);
+  check('buildChart: hard 17 vs A (H17), no surrender -> S (Rs falls back to stand)', nsHardRow(17).cells[colIdx('A')], 'S');
+  check('buildChart: 8,8 vs A (H17), no surrender -> P (Rp falls back to split)', nsPairRow('8').cells[colIdx('A')], 'P');
+})();
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exitCode = fail > 0 ? 1 : 0;
