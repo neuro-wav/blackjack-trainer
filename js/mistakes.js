@@ -109,8 +109,38 @@ function describeScenarioForDisplay(key) {
   return `${handDesc} vs ${dealerLabel}`;
 }
 
+// Build a chart-shaped accuracy grid from mistake-tracking data, matching
+// the same row/column layout as App.Strategy.buildChart (dealer upcards as
+// columns; hard/soft/pair totals as rows) so it can render as a heat map
+// aligned with the strategy chart. Each cell: { seen, missed, accuracy }
+// where accuracy is null when the scenario hasn't been seen yet.
+function heatmapRows(data) {
+  const cellFor = (descriptor, dealerLabel) => {
+    const key = `${descriptor}_vs_${dealerLabel}`;
+    const m = data[key];
+    if (!m || m.seen === 0) return { seen: 0, missed: 0, accuracy: null };
+    return { seen: m.seen, missed: m.missed, accuracy: (m.seen - m.missed) / m.seen };
+  };
+
+  const hardRows = HARD_TOTALS.map(total => ({
+    label: String(total),
+    cells: DEALER_LABELS.map(dl => cellFor(`hard${total}`, dl)),
+  }));
+  const softRows = SOFT_TOTALS.map(total => ({
+    label: `A,${total - 11}`,
+    cells: DEALER_LABELS.map(dl => cellFor(`soft${total}`, dl)),
+  }));
+  const pairRows = PAIR_RANKS.map(rank => ({
+    label: `${rank},${rank}`,
+    cells: DEALER_LABELS.map(dl => cellFor(`pair${rank}`, dl)),
+  }));
+
+  return { cols: DEALER_LABELS, hardRows, softRows, pairRows };
+}
+
 App.Mistakes = {
   ALL_SCENARIOS,
+  heatmapRows,
 
   scenarioKey,
   describeScenarioForDisplay,

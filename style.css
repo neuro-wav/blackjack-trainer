@@ -207,6 +207,44 @@ input[type="range"] { accent-color: var(--gold); width: 160px; }
 .chart-key-p { background: var(--blue); color: var(--cream); }
 .chart-key-r { background: var(--red); color: var(--cream); }
 
+.heatmap-cell {
+  color: var(--cream);
+  font-weight: 700;
+}
+.heatmap-cell-nodata {
+  background: rgba(245,239,227,0.06);
+  color: var(--muted);
+  font-weight: 400;
+}
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--cream);
+}
+.heatmap-legend-bar {
+  width: 120px;
+  height: 0.9em;
+  border-radius: 4px;
+  background: linear-gradient(to right, hsl(0,65%,38%), hsl(60,65%,38%), hsl(120,65%,38%));
+}
+.heatmap-legend-nodata {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 10px;
+  color: var(--muted);
+}
+.heatmap-key {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  border-radius: 4px;
+  background: rgba(245,239,227,0.06);
+  border: 1px solid rgba(245,239,227,0.2);
+}
+
 .trouble-spots { margin-top: 14px; }
 .trouble-spots-label {
   font-size: 0.8rem;

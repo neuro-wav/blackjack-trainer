@@ -90,6 +90,7 @@ function cacheEls() {
     'feedback-banner', 'action-buttons', 'yesno-buttons', 'count-input-row', 'count-answer', 'count-submit',
     'listen-btn', 'pause-btn', 'repeat-btn', 'mute-btn', 'drill-indicator',
     'chart-btn', 'chart-panel', 'chart-close-btn', 'chart-rules-summary', 'chart-hard', 'chart-soft', 'chart-pairs',
+    'heatmap-btn', 'heatmap-panel', 'heatmap-close-btn', 'heatmap-hard', 'heatmap-soft', 'heatmap-pairs',
   ].forEach(id => { els[id] = $(id); });
 }
 
@@ -203,6 +204,48 @@ function renderChartTable(title, cols, rows) {
   return `<table class="chart-table">${head}${body}</table>`;
 }
 
+// ===== Drill-mode accuracy heat map =====
+function toggleHeatmap() {
+  setHeatmapVisible(els['heatmap-panel'].classList.contains('hidden'));
+}
+
+function setHeatmapVisible(visible) {
+  if (visible) renderHeatmap();
+  els['heatmap-panel'].classList.toggle('hidden', !visible);
+  els['heatmap-btn'].setAttribute('aria-pressed', String(visible));
+  els['heatmap-btn'].classList.toggle('active', visible);
+}
+
+function renderHeatmap() {
+  const grid = App.Mistakes.heatmapRows(state.mistakes);
+  els['heatmap-hard'].innerHTML = renderHeatmapTable('Hard Totals', grid.cols, grid.hardRows);
+  els['heatmap-soft'].innerHTML = renderHeatmapTable('Soft Totals', grid.cols, grid.softRows);
+  els['heatmap-pairs'].innerHTML = renderHeatmapTable('Pairs', grid.cols, grid.pairRows);
+}
+
+// Red (0% correct) -> green (100% correct) via HSL hue interpolation.
+function accuracyColor(accuracy) {
+  const hue = Math.round(accuracy * 120);
+  return `hsl(${hue}, 65%, 38%)`;
+}
+
+function renderHeatmapTable(title, cols, rows) {
+  const head = `<tr><th>${title}</th>${cols.map(c => `<th>${c}</th>`).join('')}</tr>`;
+  const body = rows.map(row => {
+    const cells = row.cells.map(cell => {
+      if (cell.accuracy === null) {
+        return `<td class="heatmap-cell heatmap-cell-nodata" title="Not seen yet">&ndash;</td>`;
+      }
+      const pct = Math.round(cell.accuracy * 100);
+      const style = `background:${accuracyColor(cell.accuracy)}`;
+      const title = `${pct}% correct (${cell.seen - cell.missed}/${cell.seen})`;
+      return `<td class="heatmap-cell" style="${style}" title="${title}">${pct}</td>`;
+    }).join('');
+    return `<tr><th>${row.label}</th>${cells}</tr>`;
+  }).join('');
+  return `<table class="chart-table">${head}${body}</table>`;
+}
+
 function readSettingsFromForm() {
   return {
     decks: parseInt(els['opt-decks'].value, 10),
@@ -235,6 +278,7 @@ function wireEvents() {
   els['settings-btn'].addEventListener('click', () => {
     stopPractice();
     setChartVisible(false);
+    setHeatmapVisible(false);
     showView('settings');
   });
 
@@ -247,6 +291,13 @@ function wireEvents() {
   });
   els['chart-close-btn'].addEventListener('click', () => {
     setChartVisible(false);
+  });
+
+  els['heatmap-btn'].addEventListener('click', () => {
+    toggleHeatmap();
+  });
+  els['heatmap-close-btn'].addEventListener('click', () => {
+    setHeatmapVisible(false);
   });
 
   els['mute-btn'].addEventListener('click', () => {
@@ -341,6 +392,8 @@ function startPractice() {
   els['count-stat-running'].classList.toggle('hidden', !showCount);
   els['count-stat-true'].classList.toggle('hidden', !showCount);
   els['drill-indicator'].classList.toggle('hidden', !state.drillMode);
+  els['heatmap-btn'].classList.toggle('hidden', !state.drillMode);
+  if (!state.drillMode) setHeatmapVisible(false);
   updateStats();
   showView('practice');
   clearFeedback();
@@ -508,6 +561,7 @@ async function handleActionDecision(playerCards, dealerUp, hand, rules, trueCoun
   const mistakeKey = App.Mistakes.scenarioKey(hand, dealerUp.label);
   state.mistakes = App.Mistakes.recordAttempt(state.mistakes, mistakeKey, isCorrect);
   renderTroubleSpots();
+  if (!els['heatmap-panel'].classList.contains('hidden')) renderHeatmap();
 
   highlightButtons(answer, result.action);
 
