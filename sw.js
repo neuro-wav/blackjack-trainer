@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'bjt-v2';
+const CACHE_VERSION = 'bjt-v3';
 
 const STATIC_ASSETS = [
   './',
